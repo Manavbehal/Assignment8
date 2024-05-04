@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>Contraction timer</title>
+</head>
+<body>
+    <div class="container">
+        <div class="maincontainer">
+            <div class="topdiv">
+                <img src="images/back.png" id="arrowicon" alt="Icon">
+                <h5>Contraction timer</h5>
+                <img src="/images/bell.png" id="bellicon" alt="Icon">    
+            </div>
+            <div class="timer">
+                <div class="counter">00:00:00</div>
+                <p class="para">Time since last contraction</p>
+                <h5 class="contractiontimer">0 min 0 sec</h5>
+                <button id="startButton">Start timing</button>
+            </div>
+            <div class="table">
+                <table>
+                    <tr>
+                        <th>Length</th>
+                        <th>Time apart</th>
+                        <th>Start and end time</th>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="behindcontainer"></div>
+    </div>
+
+    <script>
+        var timerInterval;
+        var isTimerRunning = false;
+        var lastContractionStartTime = 0;
+        var currentRow = 0;
+        var numRows = 4;
+        var contractionData = [];
+    
+        document.getElementById("startButton").addEventListener("click", function() {
+            var counter = document.querySelector(".counter");
+            var contractionTimer = document.querySelector(".contractiontimer");
+            var table = document.querySelector("table");
+    
+            function updateContractionTimer() {
+                var currentTime = new Date().getTime();
+                var timeSinceLastContraction = currentTime - lastContractionStartTime;
+                var secondsSinceLastContraction = Math.floor(timeSinceLastContraction / 1000);
+                var minutes = Math.floor((timeSinceLastContraction % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((timeSinceLastContraction % (1000 * 60)) / 1000);
+                contractionTimer.textContent = minutes + " min " + seconds + " sec";
+                var startDate = new Date(lastContractionStartTime);
+                var endDate = new Date(currentTime);
+                var timeApart = minutes + " min " + seconds + " sec";
+                var length = Math.floor(timeSinceLastContraction / 1000);
+                var startDateString = formatDate(startDate);
+                var endDateString = formatDate(endDate);
+                contractionData[currentRow] = {
+                    length: length,
+                    timeApart: timeApart,
+                    start: startDateString,
+                    end: endDateString
+                };
+                var row = table.rows[currentRow + 1];
+                row.cells[0].textContent = length + "s";
+                row.cells[1].textContent = timeApart;
+                row.cells[2].textContent = startDateString + " - " + endDateString;
+                currentRow = (currentRow + 1) % numRows;
+            }
+    
+            function startTimer() {
+                lastContractionStartTime = new Date().getTime();
+                updateCounter(); // Update the counter immediately
+                timerInterval = setInterval(updateCounter, 1000);
+            }
+    
+            function updateCounter() {
+                var currentTime = new Date().getTime();
+                var elapsedTime = currentTime - lastContractionStartTime;
+                var hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+                var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+                counter.textContent = hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+            }
+    
+            if (!isTimerRunning) {
+                startTimer();
+                isTimerRunning = true;
+            } else {
+                clearInterval(timerInterval);
+                updateContractionTimer();
+                counter.textContent = "00:00:00";
+                isTimerRunning = false;
+            }
+        });
+    
+        function formatDate(date) {
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = (minutes < 10 ? "0" : "") + minutes;
+            return hours + ":" + minutes + " " + ampm;
+        }
+    </script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+  
+</body>
+</html>
